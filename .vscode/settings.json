@@ -1,3 +1,5 @@
 {
-  "cmake.sourceDirectory": "E:/flutter_application_skysense/linux"
+  "cmake.sourceDirectory": "C:/backup/flutter_application_skysense/linux",
+  "python-envs.defaultEnvManager": "ms-python.python:system",
+  "python-envs.pythonProjects": []
 }

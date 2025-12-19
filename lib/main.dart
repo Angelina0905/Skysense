@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/dashboard_page.dart';
-//import 'pages/grafik_page.dart';
+import 'pages/splash_screen.dart';  // ⬅️ tambahkan ini
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +14,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SkySense',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const DashboardPage(), // default buka dashboard
+      home: const SplashScreen(),  // ⬅️ ubah ini
     );
   }
 }

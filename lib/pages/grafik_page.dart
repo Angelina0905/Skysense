@@ -6,122 +6,171 @@ class GrafikPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // === DATA PRAKIRAAN DINAMIS (bisa kamu ubah) ===
+    final List<Map<String, dynamic>> forecastData = [
+      {"time": "09.00", "temp": 22},
+      {"time": "12.00", "temp": 26},
+      {"time": "15.00", "temp": 23},
+      {"time": "18.00", "temp": 20},
+    ];
+
     return Scaffold(
+      backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
         title: const Text("Grafik Data Cuaca"),
         backgroundColor: Colors.lightBlue,
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Grafik Perubahan Suhu per Jam",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 200, child: LineChartSample()),
-
-              const SizedBox(height: 30),
-
-              const Text(
-                "Grafik Curah Hujan per Hari",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 200, child: BarChartSample()),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Line Chart untuk suhu per jam
-class LineChartSample extends StatelessWidget {
-  const LineChartSample({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return LineChart(
-      LineChartData(
-        gridData: FlGridData(show: true, drawVerticalLine: true),
-        titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: true, interval: 2),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: 1,
-              getTitlesWidget: (value, meta) {
-                return Text("${value.toInt()}h",
-                    style: const TextStyle(fontSize: 10));
-              },
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Grafik Perubahan Suhu",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          ),
-        ),
-        borderData: FlBorderData(show: true),
-        lineBarsData: [
-          LineChartBarData(
-            isCurved: true,
-            spots: const [
-              FlSpot(1, 24),
-              FlSpot(2, 25),
-              FlSpot(3, 26),
-              FlSpot(4, 27),
-              FlSpot(5, 26),
-              FlSpot(6, 28),
-            ],
-            barWidth: 3,
-            color: Colors.red,
-            dotData: FlDotData(show: true),
-          ),
-        ],
-      ),
-    );
-  }
-}
+            const SizedBox(height: 20),
 
-/// Bar Chart untuk curah hujan per hari
-class BarChartSample extends StatelessWidget {
-  const BarChartSample({super.key});
+            // === LINE CHART DINAMIS ===
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(12),
+              height: 280,
+              child: LineChart(
+                LineChartData(
+                  minY: _minTemp(forecastData) - 2,
+                  maxY: _maxTemp(forecastData) + 2,
+                  gridData: FlGridData(show: true),
+                  borderData: FlBorderData(show: true),
 
-  @override
-  Widget build(BuildContext context) {
-    return BarChart(
-      BarChartData(
-        gridData: FlGridData(show: false),
-        titlesData: FlTitlesData(
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget: (value, meta) {
-                final days = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
-                if (value.toInt() >= 0 && value.toInt() < days.length) {
-                  return Text(days[value.toInt()],
-                      style: const TextStyle(fontSize: 10));
-                }
-                return const Text("");
-              },
+                  /// =============================
+                  /// === TITLES (WAKTU & SUHU) ===
+                  /// =============================
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          if (value.toInt() < forecastData.length) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                forecastData[value.toInt()]["time"],
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            );
+                          }
+                          return const SizedBox();
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 2,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            "${value.toInt()}°",
+                            style: const TextStyle(fontSize: 10),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  /// =============================
+                  /// === GARIS DATA DINAMIS ======
+                  /// =============================
+                  lineBarsData: [
+                    LineChartBarData(
+                      isCurved: true,
+                      color: Colors.orange,
+                      barWidth: 3,
+                      dotData: FlDotData(show: true),
+                      spots: List.generate(
+                        forecastData.length,
+                        (i) => FlSpot(
+                          i.toDouble(),
+                          forecastData[i]["temp"].toDouble(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: true, interval: 5),
-          ),
+
+            const SizedBox(height: 30),
+
+            const Text(
+              "Prakiraan Cuaca",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+
+            // CARD PRAKIRAAN
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: forecastData.map((data) {
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  width: 85,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        data["time"],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Icon(Icons.wb_sunny, size: 30),
+                      const SizedBox(height: 8),
+                      Text(
+                        "${data["temp"]}°C",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
         ),
-        borderData: FlBorderData(show: false),
-        barGroups: [
-          BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 10, color: Colors.blue)]),
-          BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 15, color: Colors.blue)]),
-          BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 8, color: Colors.blue)]),
-          BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 12, color: Colors.blue)]),
-          BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 20, color: Colors.blue)]),
-          BarChartGroupData(x: 5, barRods: [BarChartRodData(toY: 17, color: Colors.blue)]),
-          BarChartGroupData(x: 6, barRods: [BarChartRodData(toY: 9, color: Colors.blue)]),
-        ],
       ),
     );
   }
+
+  // Helper buat auto-scale grafik
+  double _minTemp(List<Map<String, dynamic>> data) => data
+      .map((e) => e["temp"] as int)
+      .reduce((a, b) => a < b ? a : b)
+      .toDouble();
+
+  double _maxTemp(List<Map<String, dynamic>> data) => data
+      .map((e) => e["temp"] as int)
+      .reduce((a, b) => a > b ? a : b)
+      .toDouble();
 }
